@@ -2,13 +2,17 @@ import 'regenerator-runtime/runtime'
 import React from 'react'
 import { login, logout } from './utils'
 import './global.css'
-// import { NFTStorage, File } from 'nft.storage'
 import Axios from 'axios'
+import Big from 'big.js';
 import getConfig from './config'
+import axios from 'axios'
 const { networkId } = getConfig(process.env.NODE_ENV || 'development')
 const near_storage = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDczMmJDYzgxNTIyQjYyNjU2OWY3QzMzMDUyZWUxZENDM0VDNTNCY0UiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYzNzU5NTA3NTI4NiwibmFtZSI6Im5lYXIifQ.5KERBHWxlWTI7l3AnUTONYGsydobjwzZSEa3SIRTEMw'
 // const client = new NFTStorage({ token: near_storage })
 const nft_storage_api = 'https://api.nft.storage'
+const BOATLOAD_OF_GAS = Big(3).times(10 ** 14).toFixed();
+// 6380000000000000000000
+const DEPOSIT_OF_GAS = Big(70).times(10 ** 18).toFixed();
 
 
 export default function App() {
@@ -29,10 +33,10 @@ export default function App() {
       if (window.walletConnection.isSignedIn()) {
 
         // window.contract is set by initContract in index.js
-        window.contract.get_greeting({ account_id: window.accountId })
-          .then(greetingFromContract => {
-            set_greeting(greetingFromContract)
-          })
+        // window.contract.get_greeting({ account_id: window.accountId })
+        //   .then(greetingFromContract => {
+        //     set_greeting(greetingFromContract)
+        //   })
       }
     },
 
@@ -95,16 +99,41 @@ export default function App() {
 
           // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
           const newGreeting = greeting.value
+          console.log(newGreeting)
 
           // disable the form while the value gets updated on-chain
           fieldset.disabled = true
 
           try {
-            // make an update call to the smart contract
-            await window.contract.set_greeting({
-              // pass the value that the user entered in the greeting field
-              message: newGreeting
-            })
+            var reader  = new FileReader();
+            reader.onloadend = async function () {
+              const post = await axios.post(`${nft_storage_api}/upload`, reader.result, {headers: {'Authorization': `Bearer ${near_storage}`}})
+              console.log(post);
+
+              window.contract.nft_mint(
+                { 
+                  receiver_id: window.accountId,
+                  token_id: `${Math.floor(Math.random() * 10)}`, 
+                  token_metadata: {
+                    title: 'My NFT',
+                    media: `https://${post.data.value.cid}.ipfs.dweb.link/`,
+                    copies: 1
+                  }
+                }, '100000000000000', '10000000000000000000000')
+              .then(greetingFromContract => {
+                console.log(greetingFromContract)
+                // show Notification
+                setShowNotification(true)
+
+                // remove Notification again after css animation completes
+                // this allows it to be shown again next time the form is submitted
+                setTimeout(() => {
+                  setShowNotification(false)
+                }, 11000)
+              })
+            }
+            reader.readAsDataURL(greeting.files[0]);
+
           } catch (e) {
             alert(
               'Something went wrong! ' +
@@ -117,17 +146,6 @@ export default function App() {
             fieldset.disabled = false
           }
 
-          // update local `greeting` variable to match persisted value
-          set_greeting(newGreeting)
-
-          // show Notification
-          setShowNotification(true)
-
-          // remove Notification again after css animation completes
-          // this allows it to be shown again next time the form is submitted
-          setTimeout(() => {
-            setShowNotification(false)
-          }, 11000)
         }}>
           <fieldset id="fieldset">
             <label
@@ -142,6 +160,7 @@ export default function App() {
             </label>
             <div style={{ display: 'flex' }}>
               <input
+                type="file"
                 autoComplete="off"
                 defaultValue={greeting}
                 id="greeting"
