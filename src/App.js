@@ -2,18 +2,15 @@ import 'regenerator-runtime/runtime'
 import React from 'react'
 import { login, logout } from './utils'
 import './global.css'
-import Axios from 'axios'
 import Big from 'big.js';
 import getConfig from './config'
 import axios from 'axios'
+import queryString from 'query-string';
 const { networkId } = getConfig(process.env.NODE_ENV || 'development')
 const near_storage = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDczMmJDYzgxNTIyQjYyNjU2OWY3QzMzMDUyZWUxZENDM0VDNTNCY0UiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYzNzU5NTA3NTI4NiwibmFtZSI6Im5lYXIifQ.5KERBHWxlWTI7l3AnUTONYGsydobjwzZSEa3SIRTEMw'
-// const client = new NFTStorage({ token: near_storage })
 const nft_storage_api = 'https://api.nft.storage'
 const BOATLOAD_OF_GAS = Big(3).times(10 ** 14).toFixed();
-// 6380000000000000000000
 const DEPOSIT_OF_GAS = Big(70).times(10 ** 18).toFixed();
-
 
 export default function App() {
   // use React Hooks to store greeting in component state
@@ -31,12 +28,10 @@ export default function App() {
     () => {
       // in this case, we only care to query the contract when signed in
       if (window.walletConnection.isSignedIn()) {
-
-        // window.contract is set by initContract in index.js
-        // window.contract.get_greeting({ account_id: window.accountId })
-        //   .then(greetingFromContract => {
-        //     set_greeting(greetingFromContract)
-        //   })
+        const hash = queryString.parse(window.location.search, { ignoreQueryPrefix: true }).transactionHashes
+        if(hash) {
+          setShowNotification(true);
+        }
       }
     },
 
@@ -75,7 +70,7 @@ export default function App() {
     // use React Fragment, <>, to avoid wrapping elements in unnecessary divs
     <>
       <button className="link" style={{ float: 'right' }} onClick={logout}>
-        Sign out
+        Sign out [{window.accountId}]
       </button>
       <main>
         <h1>
@@ -86,16 +81,13 @@ export default function App() {
               borderBottom: '2px solid var(--secondary)'
             }}
           >
-            {greeting}
           </label>
-          {' '/* React trims whitespace around tags; insert literal space character when needed */}
-          {window.accountId}!
         </h1>
         <form onSubmit={async event => {
           event.preventDefault()
 
           // get elements from the form using their id attribute
-          const { fieldset, greeting } = event.target.elements
+          const { fieldset, titleInput, greeting } = event.target.elements
 
           // hold onto new user-entered value from React's SynthenticEvent for use after `await` call
           const newGreeting = greeting.value
@@ -115,7 +107,7 @@ export default function App() {
                   receiver_id: window.accountId,
                   token_id: `${Math.floor(Math.random() * 10)}`, 
                   token_metadata: {
-                    title: 'My NFT',
+                    title: titleInput.value,
                     media: `https://${post.data.value.cid}.ipfs.dweb.link/`,
                     copies: 1
                   }
@@ -149,6 +141,21 @@ export default function App() {
         }}>
           <fieldset id="fieldset">
             <label
+              htmlFor="titleInput"
+              style={{
+                display: 'block',
+                color: 'var(--gray)',
+                marginBottom: '0.5em'
+              }}
+            >
+              NFT Title:
+            </label>
+            <input
+                autoComplete="off"
+                id="titleInput"
+                style={{ flex: 1 }}
+              />
+            <label
               htmlFor="greeting"
               style={{
                 display: 'block',
@@ -156,7 +163,7 @@ export default function App() {
                 marginBottom: '0.5em'
               }}
             >
-              Change greeting
+              Select an image:
             </label>
             <div style={{ display: 'flex' }}>
               <input
@@ -171,27 +178,11 @@ export default function App() {
                 disabled={buttonDisabled}
                 style={{ borderRadius: '0 5px 5px 0' }}
               >
-                Save
+                Mint NFT
               </button>
             </div>
           </fieldset>
         </form>
-        <p>
-          Look at that! A Hello World app! This greeting is stored on the NEAR blockchain. Check it out:
-        </p>
-        <ol>
-          <li>
-            Look in <code>src/App.js</code> and <code>src/utils.js</code> – you'll see <code>get_greeting</code> and <code>set_greeting</code> being called on <code>contract</code>. What's this?
-          </li>
-          <li>
-            Ultimately, this <code>contract</code> code is defined in <code>assembly/main.ts</code> – this is the source code for your <a target="_blank" rel="noreferrer" href="https://docs.near.org/docs/develop/contracts/overview">smart contract</a>.</li>
-          <li>
-            When you run <code>yarn dev</code>, the code in <code>assembly/main.ts</code> gets deployed to the NEAR testnet. You can see how this happens by looking in <code>package.json</code> at the <code>scripts</code> section to find the <code>dev</code> command.</li>
-        </ol>
-        <hr />
-        <p>
-          To keep learning, check out <a target="_blank" rel="noreferrer" href="https://docs.near.org">the NEAR docs</a> or look through some <a target="_blank" rel="noreferrer" href="https://examples.near.org">example apps</a>.
-        </p>
       </main>
       {showNotification && <Notification />}
     </>
@@ -207,7 +198,7 @@ function Notification() {
         {window.accountId}
       </a>
       {' '/* React trims whitespace around tags; insert literal space character when needed */}
-      called method: 'set_greeting' in contract:
+      called method: 'nft_mint' in contract:
       {' '}
       <a target="_blank" rel="noreferrer" href={`${urlPrefix}/${window.contract.contractId}`}>
         {window.contract.contractId}
