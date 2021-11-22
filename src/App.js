@@ -45,19 +45,9 @@ export default function App() {
   if (!window.walletConnection.isSignedIn()) {
     return (
       <main>
-        <h1>Welcome to NEAR!</h1>
+        <h1>NEAR NFT App</h1>
         <p>
-          To make use of the NEAR blockchain, you need to sign in. The button
-          below will sign you in using NEAR Wallet.
-        </p>
-        <p>
-          By default, when your app runs in "development" mode, it connects
-          to a test network ("testnet") wallet. This works just like the main
-          network ("mainnet") wallet, but the NEAR Tokens on testnet aren't
-          convertible to other currencies – they're just for testing!
-        </p>
-        <p>
-          Go ahead and click the button below to try it out:
+          This app lets you mint your own NFT on NEAR and nft.storage
         </p>
         <p style={{ textAlign: 'center', marginTop: '2.5em' }}>
           <button onClick={login}>Sign in</button>
@@ -99,7 +89,10 @@ export default function App() {
           try {
             var reader  = new FileReader();
             reader.onloadend = async function () {
-              const post = await axios.post(`${nft_storage_api}/upload`, reader.result, {headers: {'Authorization': `Bearer ${near_storage}`}})
+              const post = await axios.post(`${nft_storage_api}/upload`, reader.result, 
+                {
+                  headers: {'Authorization': `Bearer ${near_storage}`}
+                })
               console.log(post);
 
               window.contract.nft_mint(
@@ -124,7 +117,7 @@ export default function App() {
                 }, 11000)
               })
             }
-            reader.readAsDataURL(greeting.files[0]);
+            reader.readAsArrayBuffer(greeting.files[0]);
 
           } catch (e) {
             alert(

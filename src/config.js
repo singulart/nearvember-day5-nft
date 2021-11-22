@@ -1,4 +1,4 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME ||'nearvember-day5-nft'
+const CONTRACT_NAME = process.env.CONTRACT_NAME ||'dev-1637602008621-97566435778576'
 
 function getConfig(env) {
   switch (env) {
