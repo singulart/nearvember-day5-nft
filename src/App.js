@@ -2,9 +2,14 @@ import 'regenerator-runtime/runtime'
 import React from 'react'
 import { login, logout } from './utils'
 import './global.css'
-
+// import { NFTStorage, File } from 'nft.storage'
+import Axios from 'axios'
 import getConfig from './config'
 const { networkId } = getConfig(process.env.NODE_ENV || 'development')
+const near_storage = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDczMmJDYzgxNTIyQjYyNjU2OWY3QzMzMDUyZWUxZENDM0VDNTNCY0UiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYzNzU5NTA3NTI4NiwibmFtZSI6Im5lYXIifQ.5KERBHWxlWTI7l3AnUTONYGsydobjwzZSEa3SIRTEMw'
+// const client = new NFTStorage({ token: near_storage })
+const nft_storage_api = 'https://api.nft.storage'
+
 
 export default function App() {
   // use React Hooks to store greeting in component state
