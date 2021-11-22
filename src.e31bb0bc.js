@@ -46775,21 +46775,12 @@ __exportStar(require("./browser-connect"), exports);
 require("error-polyfill");
 
 },{"./key_stores/browser-index":"../node_modules/near-api-js/lib/key_stores/browser-index.js","./common-index":"../node_modules/near-api-js/lib/common-index.js","./browser-connect":"../node_modules/near-api-js/lib/browser-connect.js","error-polyfill":"../node_modules/error-polyfill/index.js"}],"config.js":[function(require,module,exports) {
-const CONTRACT_NAME = "dev-1637602008621-97566435778576" || 'nearvember-day5-nft';
+const CONTRACT_NAME = "dev-1637612386424-18749937841332" || 'day5.isonar.testnet';
 
 function getConfig(env) {
   switch (env) {
     case 'production':
     case 'mainnet':
-      return {
-        networkId: 'mainnet',
-        nodeUrl: 'https://rpc.mainnet.near.org',
-        contractName: CONTRACT_NAME,
-        walletUrl: 'https://wallet.near.org',
-        helperUrl: 'https://helper.mainnet.near.org',
-        explorerUrl: 'https://explorer.mainnet.near.org'
-      };
-
     case 'development':
     case 'testnet':
       return {
@@ -50560,7 +50551,7 @@ function App() {
             window.contract.nft_mint({
               receiver_id: window.accountId,
               token_id: `${Math.floor(Math.random() * 10)}`,
-              token_metadata: {
+              metadata: {
                 title: titleInput.value,
                 media: `https://${post.data.value.cid}.ipfs.dweb.link/`,
                 copies: 1
@@ -50689,7 +50680,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58069" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65264" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
