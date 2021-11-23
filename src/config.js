@@ -1,18 +1,10 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME ||'dev-1637602008621-97566435778576'
+const CONTRACT_NAME = process.env.CONTRACT_NAME ||'day55.isonar.testnet'
 
 function getConfig(env) {
   switch (env) {
 
   case 'production':
   case 'mainnet':
-    return {
-      networkId: 'mainnet',
-      nodeUrl: 'https://rpc.mainnet.near.org',
-      contractName: CONTRACT_NAME,
-      walletUrl: 'https://wallet.near.org',
-      helperUrl: 'https://helper.mainnet.near.org',
-      explorerUrl: 'https://explorer.mainnet.near.org',
-    }
   case 'development':
   case 'testnet':
     return {
